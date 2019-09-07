@@ -22,35 +22,36 @@ namespace  @(project.Module).API.Filters
 
         public GlobalExceptionFilter(IHostingEnvironment env, ILogger@("<GlobalExceptionFilter>") logger)
         {
-        this.env = env;
-        this.logger = logger;
+            this.env = env;
+            this.logger = logger;
         }
 
         public void OnException(ExceptionContext context)
         {
-        context.ExceptionHandled = true;
-        var exception = context.Exception;
-        logger.LogError(
-        new EventId(exception.HResult),
-        exception,
-        exception.Message);
-        string errorCode = "0001";
-        if (exception is APIException) { errorCode = (exception as APIException).ErrorCode; }
-        var errorResp = new ResponseMessage
-        {
-        Message = exception.Message,
-        ErrorCode = errorCode,
-        IsSuccess = false
-        };
-        var result = new JsonResult(errorResp)
-        {
-        StatusCode = (int)HttpStatusCode.OK
-        };
-        context.Result = result;
+            context.ExceptionHandled = true;
+            var exception = context.Exception;
+            logger.LogError(
+            new EventId(exception.HResult),
+            exception,
+            exception.Message);
+            int errorCode = 200;
+            if (exception is APIException) { errorCode = (exception as APIException).code; }
+            var errorResp = new ResponseMessage@("<object>")
+            {
+                msg = exception.Message,
+                code = errorCode,
+                success = false,
+                data = null
+            };
+            var result = new JsonResult(errorResp)
+            {
+                StatusCode = (int)HttpStatusCode.OK
+            };
+            context.Result = result;
 
         }
-        }
-        }
+    }
+}
 
 
 

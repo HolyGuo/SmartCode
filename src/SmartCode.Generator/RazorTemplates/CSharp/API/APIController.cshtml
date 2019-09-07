@@ -30,11 +30,16 @@ namespace @(project.Module).API.Controllers
 {
     @table.GetCSharpSummary()
     [ApiController]
-    [Route("[controller]/[action]")]
+    [Route("api/[controller]/[action]")]
     public class @(table.ConvertedName)Controller : Controller
     {
+        @SummaryExtensions.GetCSharpSummary(table.Description+"("+table.Name+") Service")
         public @serviceName @serviceName { get; }
+
+        @SummaryExtensions.GetCSharpSummary(table.Description+"("+table.Name+") Repository")
         public I@(repositoryName) @repositoryName { get; }
+
+        @SummaryExtensions.GetCSharpSummary(table.Name+"Controller")
         public @(table.ConvertedName)Controller(@serviceName @serviceCamelName, I@(repositoryName) @repositoryCamelName)
         {
             @serviceName = @serviceCamelName;
@@ -45,142 +50,112 @@ namespace @(project.Module).API.Controllers
         [HttpPost]
         public ResponseMessageWrap@($"<{insertRetType}>") Insert([FromBody]@entityName @entityCamelName)
         {
-            return new ResponseMessageWrap@($"<{insertRetType}>")
-            {
-                Body = @(serviceName).Insert(@entityCamelName)
-            };
+            return new ResponseMessageWrap@($"<{insertRetType}>"){ data = @(serviceName).Insert(@entityCamelName) };
         }
 
         @SummaryExtensions.GetCSharpSummary("异步新增"+table.Description+"("+table.Name+")")
         [HttpPost]
         public async Task<ResponseMessageWrap@($"<{insertRetType}>")> InsertAsync([FromBody]@entityName @entityCamelName)
         {
-            return new ResponseMessageWrap@($"<{insertRetType}>")
-            {   
-                Body = await @(serviceName).InsertAsync(@entityCamelName)
-            };
+            return new ResponseMessageWrap@($"<{insertRetType}>"){ data = await @(serviceName).InsertAsync(@entityCamelName) };
         }
 
         @SummaryExtensions.GetCSharpSummary("删除"+table.Description+"("+table.Name+")")
         [HttpDelete]
         public ResponseMessageWrap@("<int>") DeleteById(@pkType id)
         {
-            return new ResponseMessageWrap@("<int>")
-            {
-                Body = @(serviceName).DeleteById(id)
-            };
+            return new ResponseMessageWrap@("<int>"){ data = @(serviceName).DeleteById(id) };
         }
 
         @SummaryExtensions.GetCSharpSummary("异步删除"+table.Description+"("+table.Name+")")
         [HttpDelete]
         public async Task<ResponseMessageWrap@("<int>")> DeleteByIdAsync(@pkType id)
         {
-            return new ResponseMessageWrap@("<int>")
-            {
-                Body = await @(serviceName).DeleteByIdAsync(id)
-            };
+            return new ResponseMessageWrap@("<int>"){ data = await @(serviceName).DeleteByIdAsync(id) };
         }
 
         @SummaryExtensions.GetCSharpSummary("更新"+table.Description+"("+table.Name+")")
         [HttpPut]
         public ResponseMessageWrap@("<int>") Update([FromBody]@entityName @entityCamelName)
         {
-            return new ResponseMessageWrap@("<int>")
-            {
-                Body = @(serviceName).Update(@entityCamelName)
-            };
+            return new ResponseMessageWrap@("<int>"){ data = @(serviceName).Update(@entityCamelName) };
         }
 
         @SummaryExtensions.GetCSharpSummary("异步更新"+table.Description+"("+table.Name+")")
         [HttpPut]
         public async Task<ResponseMessageWrap@("<int>")> UpdateAsync([FromBody]@entityName @entityCamelName)
         {
-            return new ResponseMessageWrap@("<int>")
-            {
-                Body =await @(serviceName).UpdateAsync(@entityCamelName)
-            };
+            return new ResponseMessageWrap@("<int>"){ data =await @(serviceName).UpdateAsync(@entityCamelName) };
         }
 
         @SummaryExtensions.GetCSharpSummary("根据Id查询"+table.Description+"("+table.Name+")")
         [HttpGet]
         public ResponseMessageWrap@($"<{entityName}>") GetById(@pkType id)
         {
-            var @entityCamelName = @(repositoryName).GetById(id);
-            return new ResponseMessageWrap@($"<{entityName}>")
-            {
-                Body = @entityCamelName
-            };
+            var @entityCamelName = @(serviceName).GetById(id);
+            return new ResponseMessageWrap@($"<{entityName}>"){ data = @entityCamelName };
         }
+
         @SummaryExtensions.GetCSharpSummary("根据Id查询"+table.Description+"("+table.Name+")")
         [HttpGet]
         public async Task<ResponseMessageWrap@($"<{entityName}>")> GetByIdAsync(@pkType id)
         {
-            var @entityCamelName =await @(repositoryName).GetByIdAsync(id);
-            return new ResponseMessageWrap@($"<{entityName}>")
-            {
-                Body = @entityCamelName
-            };
+            var @entityCamelName =await @(serviceName).GetByIdAsync(id);
+            return new ResponseMessageWrap@($"<{entityName}>"){data = @entityCamelName};
         }
 
         @SummaryExtensions.GetCSharpSummary("根据条件查询"+table.Description+"("+table.Name+")")
         [HttpPost]
-        public ResponseMessageWrap@($"<QueryResponse<{entityName}>>") Query([FromBody]QueryRequest reqMsg)
+        public ResponseMessageWrap@($"<IList<{entityName}>>") Query([FromBody]QueryRequest reqMsg)
         {
             var list = @(repositoryName).Query(reqMsg);
-            return new ResponseMessageWrap@($"<QueryResponse<{entityName}>>")
-            {
-                Body = new @($"QueryResponse<{entityName}>")
-                {
-                    List = list
-                }
-            };
+            return new ResponseMessageWrap@($"<IList<{entityName}>>") { data = list };
         }
 
         @SummaryExtensions.GetCSharpSummary("异步根据条件查询"+table.Description+"("+table.Name+")")
         [HttpPost]
-        public async Task<ResponseMessageWrap@($"<QueryResponse<{entityName}>>")> QueryAsync([FromBody]QueryRequest reqMsg)
+        public async Task<ResponseMessageWrap@($"<IList<{entityName}>>")> QueryAsync([FromBody]QueryRequest reqMsg)
         {
             var list =await @(repositoryName).QueryAsync(reqMsg);
-            return new ResponseMessageWrap@($"<QueryResponse<{entityName}>>")
-            {
-                Body = new @($"QueryResponse<{entityName}>")
-                {
-                    List = list
-                }
-            };
+            return new ResponseMessageWrap@($"<IList<{entityName}>>") { data = list };
         }
 
         @SummaryExtensions.GetCSharpSummary("根据分页查询"+table.Description+"("+table.Name+")")
         [HttpPost]
-        public ResponseMessageWrap@($"<QueryByPageResponse<{entityName}>>") QueryByPage([FromBody]QueryByPageRequest reqMsg)
+        public ResponseMessageWrap@($"<IList<{entityName}>>") QueryByPage([FromBody]QueryByPageRequest reqMsg)
         {
             var total = @(repositoryName).GetRecord(reqMsg);
             var list = @(repositoryName).QueryByPage(reqMsg);
-            return new ResponseMessageWrap@($"<QueryByPageResponse<{entityName}>>")
-            {
-                Body = new @($"QueryByPageResponse<{entityName}>")
-                {
-                    Total = total,
-                    List = list
-                }
-            };
+            return new ResponseMessageWrap@($"<IList<{entityName}>>")() { count = total, data = list };
         }
 
         @SummaryExtensions.GetCSharpSummary("异步根据分页查询"+table.Description+"("+table.Name+")")
         [HttpPost]
-        public async Task<ResponseMessageWrap@($"<QueryByPageResponse<{entityName}>>")> QueryByPageAsync([FromBody]QueryByPageRequest reqMsg)
+        public async Task<ResponseMessageWrap@($"<IList<{entityName}>>")> QueryByPageAsync([FromBody]QueryByPageRequest reqMsg)
         {
             var total =await @(repositoryName).GetRecordAsync(reqMsg);
             var list =await @(repositoryName).QueryByPageAsync(reqMsg);
-            return new ResponseMessageWrap@($"<QueryByPageResponse<{entityName}>>")
-            {
-                Body = new @($"QueryByPageResponse<{entityName}>")
-                {
-                    Total = total,
-                    List = list
-                }
-            };
+            return new ResponseMessageWrap@($"<IList<{entityName}>>")() { count = total, data = list };
         }
+        
+        @SummaryExtensions.GetCSharpSummary("根据分页查询"+table.Description+"("+table.Name+")")
+        [HttpPost]
+        public ResponseMessageWrap@($"<object>") QueryDataByPage([FromBody]QueryByPageRequest reqMsg)
+        {
+            var total = @(repositoryName).QueryDataRecord(reqMsg);
+            var list = @(repositoryName).QueryDataByPage(reqMsg);
+            return new ResponseMessageWrap@("<object>") { count = total, data = list };
+        }
+        
+        @SummaryExtensions.GetCSharpSummary("异步根据分页查询"+table.Description+"("+table.Name+")")
+        [HttpPost]
+        public async Task<ResponseMessageWrap@($"<object>")> QueryDataByPageAsync([FromBody]QueryByPageRequest reqMsg)
+        {
+            var total = await @(repositoryName).QueryDataRecordAsync(reqMsg);
+            var list = await @(repositoryName).QueryDataByPageAsync(reqMsg);
+            return new ResponseMessageWrap@("<object>") { count = total, data = list };
+        }
+
 
     }
 }

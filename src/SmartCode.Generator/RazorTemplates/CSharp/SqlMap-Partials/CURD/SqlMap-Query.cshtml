@@ -17,34 +17,15 @@
     var queryStatementResultMap = table.HasColNameNotEqConvertedName ? $"ResultMap=\"{resultMapName}\"" : "";
 }
 <!--获取数据列-->
-@if (dbSource.DbRepository.DbProvider == DbProvider.PostgreSql)
-{
-    <Statement Id="Query" @queryStatementResultMap>
-        SELECT
-        <Include RefId="AllCols" />
-        From "@table.Name" T
-        <Include RefId="QueryParams" />
-        <Switch Prepend="Order By" Property="OrderBy">
-            <Default>
-                T."@pkCol.Name" Desc
-            </Default>
-        </Switch>
-        <IsNotEmpty Prepend="Limit" Property="Taken">@(dbPrefix)Taken</IsNotEmpty>
-    </Statement>
-}
-else
-{
-    <Statement Id="Query" @queryStatementResultMap>
-        SELECT
-        <Include RefId="AllCols" />
-        From @table.Name T
-        <Include RefId="QueryParams" />
-        <Switch Prepend="Order By" Property="OrderBy">
-            <Default>
-                T.@pkCol.Name Desc
-            </Default>
-        </Switch>
-        <IsNotEmpty Prepend="Limit" Property="Taken">@(dbPrefix)Taken</IsNotEmpty>
-    </Statement>
-}
-
+<Statement Id="Query" @queryStatementResultMap>
+    SELECT
+    <Include RefId="AllCols" />
+    From @table.Name T
+    <Include RefId="QueryParams" />
+    <Switch Prepend="Order By" Property="OrderBy">
+        <Default>
+            T.@pkCol.Name Desc
+        </Default>
+    </Switch>
+    <IsNotEmpty Prepend="Limit" Property="limit">@(dbPrefix)limit</IsNotEmpty>
+</Statement>

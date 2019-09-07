@@ -49,10 +49,20 @@ namespace SmartCode.Generator
 
         private string Convert(string phrase, TokenizerMapConverter tokenizerMapConverter)
         {
-            var tokenizer = TokenizerFactory.Create(tokenizerMapConverter.Tokenizer);
-            var words = tokenizer.Segment(phrase);
-            var wordsConvert = WordsConverterFactory.Create(tokenizerMapConverter.Converter);
-            return wordsConvert.Convert(words);
+            //当Tokenizer没有配置时默认返回原始字符串
+            if (tokenizerMapConverter != null)
+            {
+                var tokenizer = TokenizerFactory.Create(tokenizerMapConverter.Tokenizer);
+                var words = tokenizer.Segment(phrase);
+                var wordsConvert = WordsConverterFactory.Create(tokenizerMapConverter.Converter);
+                return wordsConvert.Convert(words);
+            }
+            else
+            {
+                return phrase;
+            }
+                
         }
+
     }
 }

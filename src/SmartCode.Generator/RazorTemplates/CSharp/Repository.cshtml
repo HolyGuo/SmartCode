@@ -58,25 +58,61 @@ namespace @(project.Module).@buildTask.Module
 
         @if (!PKNameEQId)
         {
+            @SummaryExtensions.GetCSharpSummary("根据Id查询数据")
+            @Html.NewLine()
             <text>[Statement(Id = "GetEntity")]</text>
             @Html.NewLine()
             @Html.PadLeft(8) <text>new @table.ConvertedName GetById([Param("@pkCol.ConvertedName")]@primaryKeyType id);</text>
             @Html.NewLine()
 
+            @SummaryExtensions.GetCSharpSummary("异步根据Id查询数据")
+            @Html.NewLine()
             <text>[Statement(Id = "GetEntity")]</text>
             @Html.NewLine()
             @Html.PadLeft(8) <text>new Task<@table.ConvertedName> GetByIdAsync([Param("@pkCol.ConvertedName")]@primaryKeyType id);</text>
             @Html.NewLine()
 
+            @SummaryExtensions.GetCSharpSummary("删除数据")
+            @Html.NewLine()
             <text>[Statement(Id = "Delete")]</text>
             @Html.NewLine()
             @Html.PadLeft(8) <text>new int DeleteById([Param("@pkCol.ConvertedName")]@primaryKeyType id);</text>
             @Html.NewLine()
 
+            @SummaryExtensions.GetCSharpSummary("异步删除数据")
+            @Html.NewLine()
             <text>[Statement(Id = "Delete")]</text>
             @Html.NewLine()
             @Html.PadLeft(8) <text>new Task<@("int")> DeleteByIdAsync([Param("@pkCol.ConvertedName")]@primaryKeyType id);</text>
             @Html.NewLine()
+
+            @SummaryExtensions.GetCSharpSummary("根据条件查询总数")
+            @Html.NewLine()
+            <text>[Statement(Id = "GetDataRecord")]</text>
+            @Html.NewLine()
+            <text>int QueryDataRecord(object param);</text>
+            @Html.NewLine()
+
+            @SummaryExtensions.GetCSharpSummary("异步根据条件查询总数")
+            @Html.NewLine()
+            <text>[Statement(Id = "GetDataRecord")]</text>
+            @Html.NewLine()
+            <text>Task<@("int")> QueryDataRecordAsync(object param);</text>
+            @Html.NewLine()
+
+            @SummaryExtensions.GetCSharpSummary("根据条件进行分页查询")
+            @Html.NewLine()
+            <text>[Statement(Id = "QueryDataByPage")]</text>
+            @Html.NewLine()
+            <text>List<@("object")> QueryDataByPage(object param);</text>
+            @Html.NewLine()
+
+            @SummaryExtensions.GetCSharpSummary("异步根据条件进行分页查询")
+            @Html.NewLine()
+            <text>[Statement(Id = "QueryDataByPage")]</text>
+            @Html.NewLine()
+            <text>Task @("<List<object>>") QueryDataByPageAsync(object param);</text>
+           
 
         }
     }

@@ -7,19 +7,8 @@
 }
 
 <!--是否存在该记录-->
-@if (dbSource.DbRepository.DbProvider == DbProvider.PostgreSql)
-{
-    <Statement Id="IsExist">
-        Select Count(1) From "@table.Name" T
-        <Include RefId="QueryParams" />
-    </Statement>
-}
-else
-{
-    <Statement Id="IsExist">
-        Select Count(1) From @table.Name T
-        <Include RefId="QueryParams" />
-    </Statement>
-}
-
+<Statement Id="IsExist">
+    Select Count(1) From @table.Name T
+    <Include RefId="QueryParams" />
+</Statement>
 

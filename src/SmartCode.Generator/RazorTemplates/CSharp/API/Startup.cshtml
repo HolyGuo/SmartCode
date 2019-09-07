@@ -55,6 +55,7 @@ namespace @(project.Module).API
             {
                 options.SerializerSettings.ContractResolver = new DefaultContractResolver();
             });
+            services.AddCors();
         }
 
         ///<summary>
@@ -113,7 +114,7 @@ namespace @(project.Module).API
             {
                 app.UseDeveloperExceptionPage();
             }
-
+            app.UseCors(builder => builder.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader().AllowCredentials());
             app.UseMvc();
             ConfigureSwagger(app);
         }

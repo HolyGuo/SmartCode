@@ -15,10 +15,10 @@ namespace @(project.Module).API.Messages
 {
     public class QueryByPageRequest
     {
-[Range(1, int.MaxValue)]
-        public int PageIndex { get; set; } = 1;
-[Range(1, 100)]
-        public int PageSize { get; set; } = 10;
-        public int Offset { get { return (PageIndex - 1) * PageSize; } }
+        [Range(1, int.MaxValue)]
+        public int page { get; set; } = 1;
+        [Range(1, 100)]
+        public int limit { get; set; } = 10;
+        public int offset { get { return (page - 1) * limit; } }
     }
 }

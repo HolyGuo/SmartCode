@@ -20,23 +20,11 @@
         @{ await Html.RenderPartialAsync("SqlMap-Columns.cshtml", Model); }
         <Statement Id="QueryParams">
             <Where>
-                @if (dbSource.DbRepository.DbProvider == DbProvider.PostgreSql)
+                @foreach (var col in table.Columns)
                 {
-                    @foreach (var col in table.Columns)
-                    {
-                        <IsNotEmpty Prepend="And" Property="@col.ConvertedName">
-                            T."@col.Name" = @dbPrefix@col.ConvertedName
-                        </IsNotEmpty>
-                    }
-                }
-                else
-                {
-                    @foreach (var col in table.Columns)
-                    {
-                        <IsNotEmpty Prepend="And" Property="@col.ConvertedName">
-                                T.@col.Name = @dbPrefix@col.ConvertedName                       
-                        </IsNotEmpty>
-                    }
+                    <IsNotEmpty Prepend="And" Property="@col.ConvertedName">
+                        T.@col.Name = @dbPrefix@col.ConvertedName
+                    </IsNotEmpty>
                 }
             </Where>
         </Statement>
@@ -112,6 +100,38 @@
         {
             await Html.RenderPartialAsync("./CURD/SqlMap-IsExist.cshtml", Model);
         }
+
+        <!--************************************自定义SQL查询************************************-->
+        <!---自定义  查询参数-->
+        <Statement Id="QueryDataParams">
+            <Where>
+                @foreach (var col in table.Columns)
+                {
+                    <IsNotEmpty Prepend="And" Property="@col.ConvertedName">
+                        T.@col.Name = @dbPrefix@col.ConvertedName
+                    </IsNotEmpty>
+                }
+            </Where>
+        </Statement>
+
+        <!--自定义查询  分页数据-->
+        <Statement Id="QueryDataByPage">
+            Select T.*
+            From @table.Name As T
+            <Include RefId="QueryDataParams" />
+            <Switch Prepend="Order By" Property="OrderBy">
+                <Default>
+                    T.@pkCol.Name Desc
+                </Default>
+            </Switch>
+            Limit @(dbPrefix)limit Offset @(dbPrefix)offset
+        </Statement>
+
+        <!--自定义查询  获取记录数-->
+        <Statement Id="GetDataRecord">
+            Select Count(1) From sys_user T
+            <Include RefId="QueryDataParams" />
+        </Statement>
 
     </Statements>
 </SmartSqlMap>

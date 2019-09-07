@@ -23,8 +23,8 @@ namespace @(project.Module).API.Filters
 
         public GlobalValidateModelFilter(IHostingEnvironment env, ILogger@("<GlobalValidateModelFilter>") logger)
         {
-        _env = env;
-        _logger = logger;
+            _env = env;
+            _logger = logger;
         }
         public void OnActionExecuted(ActionExecutedContext context)
         {
@@ -33,27 +33,28 @@ namespace @(project.Module).API.Filters
 
         public void OnActionExecuting(ActionExecutingContext context)
         {
-        if (!context.ModelState.IsValid)
-        {
-        _logger.LogDebug("ModelState not valid:{0}", JsonConvert.SerializeObject(context.ModelState));
-        StringBuilder errStr = new StringBuilder();
+            if (!context.ModelState.IsValid)
+            {
+                _logger.LogDebug("ModelState not valid:{0}", JsonConvert.SerializeObject(context.ModelState));
+                StringBuilder errStr = new StringBuilder();
 
-        foreach (var error in context.ModelState.Values)
-        {
-        string errorMsg = error.Errors?.FirstOrDefault()?.ErrorMessage;
-        errStr.AppendFormat("{0} |", errorMsg);
-        }
+                foreach (var error in context.ModelState.Values)
+                {
+                    string errorMsg = error.Errors?.FirstOrDefault()?.ErrorMessage;
+                    errStr.AppendFormat("{0} |", errorMsg);
+                }
 
-        var resp = new ResponseMessage
-        {
-        ErrorCode = "0006",
-        Message = errStr.ToString().TrimEnd('|'),
-        IsSuccess = false
-        };
+                var resp = new ResponseMessage@("<object>")
+                {
+                    code = 106,
+                    msg = errStr.ToString().TrimEnd('|'),
+                    success = false,
+                    data = null
+                };
 
-        var result = new JsonResult(resp);
-        context.Result = result;
+                var result = new JsonResult(resp);
+                context.Result = result;
+            }
         }
-        }
-        }
-        }
+     }
+}

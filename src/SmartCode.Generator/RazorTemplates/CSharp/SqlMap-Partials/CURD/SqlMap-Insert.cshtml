@@ -13,109 +13,54 @@
     var autoIncrement = table.AutoIncrement;
     var prefix = dbSource.DbProvider.ParameterPrefix;
 }
-@if (dbSource.DbRepository.DbProvider == DbProvider.PostgreSql)
-{
-    <!--新增-->
-    <Statement Id="Insert">
-        INSERT INTO "@table.Name"
-        (
-            @for (var colIndex = 0; colIndex < table.Columns.Count(); colIndex++)
-            {
-                var col = table.Columns.ElementAt(colIndex);
-                @if (!col.AutoIncrement)
-                {
-                    @Html.PadLeft(6)@($"\"{col.Name}\"")@(colIndex == table.Columns.Count() - 1 ? "" : ",")
-                    @Html.NewLine()
-                }
-            }
-        )
-        VALUES
-        (
-            @for (var colIndex = 0; colIndex < table.Columns.Count(); colIndex++)
-            {
-                var col = table.Columns.ElementAt(colIndex);
-                @if (!col.AutoIncrement)
-                {
-                    @Html.PadLeft(6)@prefix@col.ConvertedName@(colIndex == table.Columns.Count() - 1 ? "" : ",")
-                    @Html.NewLine()
-                }
-            }
-        )
-        @if (autoIncrement)
+<!--新增-->
+<Statement Id="Insert">
+    <IdGenerator Name="SnowflakeId" Id="id"/>
+    INSERT INTO @table.Name
+    (
+    @for (var colIndex = 0; colIndex < table.Columns.Count(); colIndex++)
+    {
+        var col = table.Columns.ElementAt(colIndex);
+        @if (!col.AutoIncrement)
         {
-            @switch (dbSource.DbRepository.DbProvider)
-            {
-                case DbProvider.MariaDB:
-                case DbProvider.MySql:
-                    {
-                        <text>;Select Last_Insert_Id();</text>
-                        break;
-                    }
-                case DbProvider.SqlServer:
-                    {
-                        <text>;Select Scope_Identity();</text>
-                        break;
-                    }
-                case DbProvider.PostgreSql:
-                    {
-                        <text>Returning @pkCol.Name;</text>
-                        break;
-                    }
-            }
+            @Html.PadLeft(6)@col.Name@(colIndex == table.Columns.Count() - 1 ? "" : ",")
             @Html.NewLine()
         }
-    </Statement>
-}
-else
-{
-    <!--新增-->
-    <Statement Id="Insert">
-        INSERT INTO @table.Name
-        (
-        @for (var colIndex = 0; colIndex < table.Columns.Count(); colIndex++)
+    }
+    )
+    VALUES
+    (
+    @for (var colIndex = 0; colIndex < table.Columns.Count(); colIndex++)
+    {
+        var col = table.Columns.ElementAt(colIndex);
+        @if (!col.AutoIncrement)
         {
-            var col = table.Columns.ElementAt(colIndex);
-            @if (!col.AutoIncrement)
-            {
-                @Html.PadLeft(6)@col.Name@(colIndex == table.Columns.Count() - 1 ? "" : ",")
-                @Html.NewLine()
-            }
-        }
-        )
-        VALUES
-        (
-        @for (var colIndex = 0; colIndex < table.Columns.Count(); colIndex++)
-        {
-            var col = table.Columns.ElementAt(colIndex);
-            @if (!col.AutoIncrement)
-            {
-                @Html.PadLeft(6)@prefix@col.ConvertedName@(colIndex == table.Columns.Count() - 1 ? "" : ",")
-                @Html.NewLine()
-            }
-        }
-        )
-        @if (autoIncrement)
-        {
-            @switch (dbSource.DbRepository.DbProvider)
-            {
-                case DbProvider.MariaDB:
-                case DbProvider.MySql:
-                    {
-                        <text>;Select Last_Insert_Id();</text>
-                        break;
-                    }
-                case DbProvider.SqlServer:
-                    {
-                        <text>;Select Scope_Identity();</text>
-                        break;
-                    }
-                case DbProvider.PostgreSql:
-                    {
-                        <text>Returning @pkCol.Name;</text>
-                        break;
-                    }
-            }
+            @Html.PadLeft(6)@prefix@col.ConvertedName@(colIndex == table.Columns.Count() - 1 ? "" : ",")
             @Html.NewLine()
         }
-    </Statement>
-}
+    }
+    )
+    @if (autoIncrement)
+    {
+        @switch (dbSource.DbRepository.DbProvider)
+        {
+            case DbProvider.MariaDB:
+            case DbProvider.MySql:
+                {
+                    <text>;Select Last_Insert_Id();</text>
+                    break;
+                }
+            case DbProvider.SqlServer:
+                {
+                    <text>;Select Scope_Identity();</text>
+                    break;
+                }
+            case DbProvider.PostgreSql:
+                {
+                    <text>Returning @pkCol.Name;</text>
+                    break;
+                }
+        }
+        @Html.NewLine()
+    }
+</Statement>
