@@ -54,6 +54,8 @@ namespace @(project.Module).API
             services.AddMvc().AddJsonOptions(options =>
             {
                 options.SerializerSettings.ContractResolver = new DefaultContractResolver();
+                //options.SerializerSettings.DateFormatString = "yyyy-MM-dd HH:mm:ss";//时间格式化
+                //options.SerializerSettings.Converters.Add(new Utils.JsonLongConverter());//long 类型格式化为string
             });
             services.AddCors();
         }

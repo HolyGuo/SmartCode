@@ -23,6 +23,7 @@
 using System;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Collections.Generic;
 using @(project.Module).Entity;
 using @(project.Module).Repository;
 
@@ -107,6 +108,39 @@ namespace @(project.Module).Service
         public async Task<@entityName> GetByIdAsync(long id)
         {
             return await @(repositoryName).GetByIdAsync(id);
+        }
+
+        /// <summary>
+        /// 根据条件查询总数
+        /// </summary>
+        /// <returns></returns>
+        public int QueryDataRecord(object param)
+        {
+            return @(repositoryName).QueryDataRecord(param);
+        }
+
+        /// <summary>
+        /// 异步根据条件查询总数
+        /// </summary>
+        public async Task<int> QueryDataRecordAsync(object param)
+        {
+            return await @(repositoryName).QueryDataRecordAsync(param);
+        }
+
+        /// <summary>
+        /// 根据条件进行分页查询
+        /// </summary>
+        public List@("<object>") QueryDataByPage(object param)
+        {
+            return @(repositoryName).QueryDataByPage(param);
+        }
+
+        /// <summary>
+        /// 异步根据条件进行分页查询
+        /// </summary>
+        public async Task<@("List<object>")> QueryDataByPageAsync(object param)
+        {
+            return await @(repositoryName).QueryDataByPageAsync(param);
         }
 
 

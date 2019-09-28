@@ -12,11 +12,11 @@ TemplateEngine:
    Root: CSharp
 Output: 
   Type: File
-  Path: 'D:\01Code\Git\dxyk\DXYKAdmin\DXYKAdminAPI'
+  Path: 'D:\01Code\Generator\DXYKAdmin'
 Parameters:
   SmartSqlVersion: '4.1.18'
   SmartSqlSchemaVersion: '4.1.16'
-  BuildDir: 'D:\01Code\Git\dxyk\DXYKAdmin\DXYKAdminAPI\build'
+  BuildDir: 'D:\01Code\Generator\DXYKAdmin\build'
   DockerImage: 'dxyk.oa'
   
 NamingConverter:

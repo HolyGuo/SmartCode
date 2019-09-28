@@ -1,0 +1,291 @@
+﻿@using SmartCode
+@using SmartCode.Generator.Extensions
+@model BuildContext
+@{
+    Layout = "../_CSharpLayout.cshtml";
+    var project = Model.Project;
+    var table = Model.GetCurrentTable();
+    var pkType = table.PKColumn.LanguageType;
+    //var insertRetType = table.AutoIncrement ? pkType : "int";
+    var insertRetType = table.AutoIncrement ? pkType : "long";
+    var entityName = table.ConvertedName;
+    var entityCamelName = NamingUtil.CamelCase(table.ConvertedName);
+    //var serviceName = $"{table.ConvertedName}Service";
+    var convertedName = table.ConvertedName;
+    var ServiceName = $"{table.ConvertedName}Service";//修改全局变量前加下划线 _
+    var serviceName = "_" + $"{NamingUtil.CamelCase(convertedName)}Service";//修改全局变量前加下划线 _
+    var serviceCamelName = $"{NamingUtil.CamelCase(convertedName)}Service";
+    //var _serviceCamelName = "_" + NamingUtil.CamelCase(serviceName);
+    //var repositoryName = $"{table.ConvertedName}Repository";
+    var RepositoryName = $"{table.ConvertedName}Repository";
+    var repositoryName = "_" + $"{NamingUtil.CamelCase(convertedName)}Repository";
+    var repositoryCamelName = $"{NamingUtil.CamelCase(convertedName)}Repository";
+    //var _repositoryCamelName = "_" + NamingUtil.CamelCase(repositoryName);
+}
+
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using Microsoft.AspNetCore.Mvc;
+using @(project.Module).Entity;
+using @(project.Module).Repository;
+using @(project.Module).Service;
+using @(project.Module).API.Messages;
+using System.Threading.Tasks;
+
+namespace @(project.Module).API.Controllers
+{
+    @table.GetCSharpSummary()
+    [ApiController]
+    [Route("api/[controller]/[action]")]
+    public class @(table.ConvertedName)Controller : Controller
+    {
+        @SummaryExtensions.GetCSharpSummary(table.Description+"("+table.Name+") Service")
+        public @ServiceName @serviceName { get; }
+
+        @SummaryExtensions.GetCSharpSummary(table.Description+"("+table.Name+") Repository")
+        public I@(RepositoryName) @repositoryName { get; }
+
+        @SummaryExtensions.GetCSharpSummary("日志服务")
+        public SysLogService _sysLogService { get; }
+
+        @SummaryExtensions.GetCSharpSummary(table.Name+"Controller")
+        public @(table.ConvertedName)Controller(@ServiceName @serviceCamelName, I@(RepositoryName) @repositoryCamelName, SysLogService sysLogService)
+        {
+            @serviceName = @serviceCamelName;
+            @repositoryName = @repositoryCamelName;
+            _sysLogService = sysLogService;
+        }
+
+        @SummaryExtensions.GetCSharpSummary("新增"+table.Description+"("+table.Name+")")
+        [HttpPost]
+        public ResponseMessage@("<long>") Insert([FromBody]@entityName @entityCamelName)
+        {
+            try
+            {
+                return new ResponseMessage@("<long>") { data = @(serviceName).Insert(@entityCamelName) }; 
+            }
+            catch (Exception ex)
+            {
+                _sysLogService.Insert(new SysLog() { app = "", logged_time = DateTime.Now, level = "error", msg = "数据插入异常", exception = ex.Message, status = "500", call_url = null, ip = null, user_id = null, login_name = null, true_name = null, browser = null });
+                return new ResponseMessage@("<long>") { success = false, code = 1, msg = "请求失败"};
+            }
+        }
+
+        @SummaryExtensions.GetCSharpSummary("异步新增"+table.Description+"("+table.Name+")")
+        [HttpPost]
+        public async Task<ResponseMessage@("<long>")>InsertAsync([FromBody]@entityName @entityCamelName)
+        {
+            try
+            {
+                return new ResponseMessage@("<long>") { data = await @(serviceName).InsertAsync(@entityCamelName) };
+            }
+            catch (Exception ex)
+            {
+                _sysLogService.Insert(new SysLog() { app = "", logged_time = DateTime.Now, level = "error", msg = "数据插入异常", exception = ex.Message, status = "500", call_url = null, ip = null, user_id = null, login_name = null, true_name = null, browser = null });
+                return new ResponseMessage@("<long>") { success = false, code = 1, msg = "请求失败" };
+            }
+        }
+
+        @SummaryExtensions.GetCSharpSummary("删除"+table.Description+"("+table.Name+")")
+        [HttpDelete]
+        public ResponseMessage@("<int>") DeleteById(@pkType id)
+        {
+            try
+            {
+                return new ResponseMessage@("<int>") { data =  @(serviceName).DeleteById(id) };
+            }
+            catch (Exception ex)
+            {
+                _sysLogService.Insert(new SysLog() { app = "", logged_time = DateTime.Now, level = "error", msg = "数据插入异常", exception = ex.Message, status = "500", call_url = null, ip = null, user_id = null, login_name = null, true_name = null, browser = null });
+                return new ResponseMessage@("<int>") { success = false, code = 1, msg = "请求失败" };
+            }
+        }
+
+        @SummaryExtensions.GetCSharpSummary("异步删除"+table.Description+"("+table.Name+")")
+        [HttpDelete]
+        public async Task<ResponseMessage@("<int>")> DeleteByIdAsync(@pkType id)
+        {
+            try
+            {
+                return new ResponseMessage@("<int>") { data = await @(serviceName).DeleteByIdAsync(id) };
+            }
+            catch (Exception ex)
+            {
+                _sysLogService.Insert(new SysLog() { app = "", logged_time = DateTime.Now, level = "error", msg = "数据插入异常", exception = ex.Message, status = "500", call_url = null, ip = null, user_id = null, login_name = null, true_name = null, browser = null });
+                return new ResponseMessage@("<int>") { success = false, code = 1, msg = "请求失败" };
+            }
+        }
+
+        @SummaryExtensions.GetCSharpSummary("更新"+table.Description+"("+table.Name+")")
+        [HttpPut]
+        public ResponseMessage@("<int>") Update([FromBody]@entityName @entityCamelName)
+        {
+            //@entityName entity = @(serviceName).GetById(@entityCamelName@(".id"));
+            //Utils.CommmonUtils.EntityToEntity(@entityCamelName, entity, null);
+            //return new ResponseMessage@("<int>") { data = @(serviceName).Update(entity) };
+            try
+            {
+                return new ResponseMessage@("<int>") { data = @(serviceName).Update(@entityCamelName) };
+            }
+            catch (Exception ex)
+            {
+                _sysLogService.Insert(new SysLog() { app = "", logged_time = DateTime.Now, level = "error", msg = "数据插入异常", exception = ex.Message, status = "500", call_url = null, ip = null, user_id = null, login_name = null, true_name = null, browser = null });
+                return new ResponseMessage@("<int>") { success = false, code = 1, msg = "请求失败" };
+            }
+        }
+
+        @SummaryExtensions.GetCSharpSummary("异步更新"+table.Description+"("+table.Name+")")
+        [HttpPut]
+        public async Task<ResponseMessage@("<int>")> UpdateAsync([FromBody]@entityName @entityCamelName)
+        {
+            try
+            {
+                //@entityName entity = await @(serviceName).GetByIdAsync(@entityCamelName@(".id"));
+                //Utils.CommmonUtils.EntityToEntity(@entityCamelName, entity, null);
+                //return new ResponseMessage@("<int>") { data = await @(serviceName).UpdateAsync(entity) };
+                return new ResponseMessage@("<int>") { data = await @(serviceName).UpdateAsync(@entityCamelName) };
+            }
+            catch (Exception ex)
+            {
+                _sysLogService.Insert(new SysLog() { app = "", logged_time = DateTime.Now, level = "error", msg = "数据插入异常", exception = ex.Message, status = "500", call_url = null, ip = null, user_id = null, login_name = null, true_name = null, browser = null });
+                return new ResponseMessage@("<int>") { success = false, code = 1, msg = "请求失败" };
+            }
+        }
+
+        @SummaryExtensions.GetCSharpSummary("根据Id查询"+table.Description+"("+table.Name+")")
+        [HttpGet]
+        public ResponseMessage@($"<{entityName}>") GetById(@pkType id)
+        {
+            try
+            {
+                var @entityCamelName = @(serviceName).GetById(id);
+                return new ResponseMessage@($"<{entityName}>") {  data = @entityCamelName };
+            }
+            catch (Exception ex)
+            {
+                _sysLogService.Insert(new SysLog() { app = "", logged_time = DateTime.Now, level = "error", msg = "数据插入异常", exception = ex.Message, status = "500", call_url = null, ip = null, user_id = null, login_name = null, true_name = null, browser = null });
+                return new ResponseMessage@($"<{entityName}>") { success = false, code = 1, msg = "请求失败" };
+            }
+        }
+
+        @SummaryExtensions.GetCSharpSummary("根据Id查询"+table.Description+"("+table.Name+")")
+        [HttpGet]
+        public async Task<ResponseMessage@($"<{entityName}>")> GetByIdAsync(@pkType id)
+        {
+            try
+            {
+                var @entityCamelName =await @(serviceName).GetByIdAsync(id);
+                return new ResponseMessage@($"<{entityName}>"){ data = @entityCamelName};
+            }
+            catch (Exception ex)
+            {
+                _sysLogService.Insert(new SysLog() { app = "", logged_time = DateTime.Now, level = "error", msg = "数据插入异常", exception = ex.Message, status = "500", call_url = null, ip = null, user_id = null, login_name = null, true_name = null, browser = null });
+                return new ResponseMessage@($"<{entityName}>") { success = false, code = 1, msg = "请求失败" };
+            }
+        }
+
+        @SummaryExtensions.GetCSharpSummary("根据条件查询"+table.Description+"("+table.Name+")")
+        [HttpPost]
+        public ResponseMessage@($"<IList<{entityName}>>") Query([FromBody]QueryRequest reqMsg)
+        {
+            try
+            {
+                var list = @(repositoryName).Query(reqMsg);
+                return new ResponseMessage@($"<IList<{entityName}>>") { data = list };
+            }
+            catch (Exception ex)
+            {
+                _sysLogService.Insert(new SysLog() { app = "", logged_time = DateTime.Now, level = "error", msg = "数据插入异常", exception = ex.Message, status = "500", call_url = null, ip = null, user_id = null, login_name = null, true_name = null, browser = null });
+                return new ResponseMessage@($"<IList<{entityName}>>") { success = false, code = 1, msg = "请求失败" };
+            }
+        }
+
+        @SummaryExtensions.GetCSharpSummary("异步根据条件查询"+table.Description+"("+table.Name+")")
+        [HttpPost]
+        public async Task<ResponseMessage@($"<IList<{entityName}>>")> QueryAsync([FromBody]QueryRequest reqMsg)
+        {
+            try
+            {
+                var list =await @(repositoryName).QueryAsync(reqMsg);
+                return new ResponseMessage@($"<IList<{entityName}>>") { data = list };
+            }
+            catch (Exception ex)
+            {
+                _sysLogService.Insert(new SysLog() { app = "", logged_time = DateTime.Now, level = "error", msg = "数据插入异常", exception = ex.Message, status = "500", call_url = null, ip = null, user_id = null, login_name = null, true_name = null, browser = null });
+                return new ResponseMessage@($"<IList<{entityName}>>") { success = false, code = 1, msg = "请求失败" };
+            }
+        }
+
+        @SummaryExtensions.GetCSharpSummary("根据分页查询"+table.Description+"("+table.Name+")")
+        [HttpPost]
+        public ResponseMessageWrap@($"<IList<{entityName}>>") QueryByPage([FromBody]QueryByPageRequest reqMsg)
+        {
+            
+            try
+            {
+                var total = @(repositoryName).GetRecord(reqMsg);
+                var list = @(repositoryName).QueryByPage(reqMsg);
+                return new ResponseMessageWrap@($"<IList<{entityName}>>")() { count = total, data = list };
+            }
+            catch (Exception ex)
+            {
+                _sysLogService.Insert(new SysLog() { app = "", logged_time = DateTime.Now, level = "error", msg = "数据插入异常", exception = ex.Message, status = "500", call_url = null, ip = null, user_id = null, login_name = null, true_name = null, browser = null });
+                return new ResponseMessageWrap@($"<IList<{entityName}>>") { success = false, code = 1, msg = "请求失败" };
+            }
+        }
+
+        @SummaryExtensions.GetCSharpSummary("异步根据分页查询"+table.Description+"("+table.Name+")")
+        [HttpPost]
+        public async Task<ResponseMessageWrap@($"<IList<{entityName}>>")> QueryByPageAsync([FromBody]QueryByPageRequest reqMsg)
+        {
+            try
+            {
+                var total =await @(repositoryName).GetRecordAsync(reqMsg);
+                var list =await @(repositoryName).QueryByPageAsync(reqMsg);
+                return new ResponseMessageWrap@($"<IList<{entityName}>>")() { count = total, data = list };
+            }
+            catch (Exception ex)
+            {
+                _sysLogService.Insert(new SysLog() { app = "", logged_time = DateTime.Now, level = "error", msg = "数据插入异常", exception = ex.Message, status = "500", call_url = null, ip = null, user_id = null, login_name = null, true_name = null, browser = null });
+                return new ResponseMessageWrap@($"<IList<{entityName}>>") { success = false, code = 1, msg = "请求失败" };
+            }
+        }
+        
+        @SummaryExtensions.GetCSharpSummary("根据分页查询"+table.Description+"("+table.Name+")")
+        [HttpPost]
+        public ResponseMessageWrap@($"<object>") QueryDataByPage([FromBody]QueryByPageRequest reqMsg)
+        {
+            try
+            {
+                var total = @(serviceName).QueryDataRecord(reqMsg);
+                var list = @(serviceName).QueryDataByPage(reqMsg);
+                return new ResponseMessageWrap@("<object>") {count = total, data = list };
+            }
+            catch (Exception ex)
+            {
+                _sysLogService.Insert(new SysLog() { app = "", logged_time = DateTime.Now, level = "error", msg = "数据插入异常", exception = ex.Message, status = "500", call_url = null, ip = null, user_id = null, login_name = null, true_name = null, browser = null });
+                return new ResponseMessageWrap@("<object>") { success = false, code = 1, msg = "请求失败" };
+            }
+        }
+        
+        @SummaryExtensions.GetCSharpSummary("异步根据分页查询"+table.Description+"("+table.Name+")")
+        [HttpPost]
+        public async Task<ResponseMessageWrap@($"<object>")> QueryDataByPageAsync([FromBody]QueryByPageRequest reqMsg)
+        {
+            try
+            {
+                var total = await @(serviceName).QueryDataRecordAsync(reqMsg);
+                var list = await @(serviceName).QueryDataByPageAsync(reqMsg);
+                return new ResponseMessageWrap@("<object>") { count = total, data = list };
+            }
+            catch (Exception ex)
+            {
+                _sysLogService.Insert(new SysLog() { app = "", logged_time = DateTime.Now, level = "error", msg = "数据插入异常", exception = ex.Message, status = "500", call_url = null, ip = null, user_id = null, login_name = null, true_name = null, browser = null });
+                return new ResponseMessageWrap@("<object>") { success = false, code = 1, msg = "请求失败" };
+            }
+        }
+
+
+    }
+}
